@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader - Скачивай видео быстро</title>
+    <style>
+        /* --- Основные настройки --- */
+        :root {
+            --bg-dark: #0f111a;
+            --bg-card: #161925;
+            --primary: #3b5bdb;
+            --primary-hover: #4c6ef5;
+            --accent: #748ffc;
+            --text-main: #ffffff;
+            --text-muted: #a0a0b0;
+            --glow: rgba(59, 91, 219, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- Глобальные стили --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        p.section-desc {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 60px auto;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(59, 91, 219, 0.1) 0%, transparent 70%);
+            padding-top: 60px;
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            line-height: 1.1;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            animation: fadeDown 1s ease forwards;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 50px;
+            animation: fadeUp 1s ease 0.2s forwards;
+            opacity: 0;
+        }
+
+        /* --- Скриншот приложения --- */
+        .app-preview {
+            margin: 50px auto 0;
+            max-width: 900px;
+            width: 100%;
+            border-radius: 24px; /* Скругление углов */
+            overflow: hidden;
+            /* Стильная тень */
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.6),
+                0 0 40px rgba(59, 91, 219, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transform: translateY(30px);
+            opacity: 0;
+            animation: fadeUp 1s ease 0.6s forwards;
+        }
+        
+        .app-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 24px; /* Дублируем скругление для самой картинки */
+        }
+
+        /* --- Кнопки --- */
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeUp 1s ease 0.4s forwards;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 18px 45px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 30px var(--glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px var(--glow);
+            background: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+        }
+
+        /* --- Секция "Простота" --- */
+        .simplicity {
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #13151f 100%);
+        }
+
+        .simplicity-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 50px;
+        }
+
+        .simplicity-text {
+            flex: 1;
+        }
+
+        .simplicity-text h2 {
+            text-align: left;
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+        }
+        
+        .highlight {
+            color: var(--accent);
+        }
+
+        .simplicity-text p {
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .simplicity-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .big-icon {
+            font-size: 15rem;
+            color: var(--bg-card);
+            text-shadow: 0 0 50px var(--glow);
+            user-select: none;
+        }
+
+        /* --- Секция Features (Карточки) --- */
+        .features {
+            background: linear-gradient(180deg, var(--bg-dark) 0%, #0f111a 100%);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            padding: 50px;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Эффект подсветки мышкой */
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.06), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .feature-card h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .feature-card p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            display: inline-block;
+            background: rgba(59, 91, 219, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            color: var(--accent);
+        }
+
+        /* --- Подвал --- */
+        footer {
+            padding: 80px 0 40px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            margin-top: auto;
+        }
+        
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .footer-links {
+            margin-bottom: 30px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .copyright {
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        /* --- Анимации --- */
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Класс для JS анимации скролла */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+        
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Адаптив */
+        @media (max-width: 900px) {
+            .hero h1 { font-size: 3rem; }
+            .simplicity-content { flex-direction: column; text-align: center; }
+            .simplicity-text h2 { text-align: center; font-size: 2.5rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .btn-group { flex-direction: column; }
+            .btn { width: 100%; text-align: center; }
+            .big-icon { font-size: 10rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HERO БЛОК -->
+    <section class="hero">
+        <div class="container">
+            <h1>YouTube<br>Downloader</h1>
+            <p class="hero-subtitle">Самый стильный и мощный инструмент для скачивания контента.<br>Без рекламы. Без ограничений.</p>
+            
+            <div class="btn-group">
+                <a href="https://github.com/kreweber/YoutubeDownloader/releases/download/0.1.0/YoutubeDownloader.zip" target="_blank" class="btn btn-primary">
+                    🚀 Скачать бесплатно
+                </a>
+                <a href="https://github.com/kreweber/YoutubeDownloader" target="_blank" class="btn btn-secondary">
+                    GitHub Repo
+                </a>
+            </div>
+
+            <!-- СКРУГЛЁННАЯ КАРТИНКА image.png -->
+            <div class="app-preview">
+                <img src="./image.png" alt="Интерфейс Youtube Downloader">
+            </div>
+        </div>
+    </section>
+
+    <!-- СЕКЦИЯ ПРОСТОТЫ -->
+    <section class="simplicity reveal">
+        <div class="container">
+            <div class="simplicity-content">
+                <div class="simplicity-text">
+                    <h2>Максимально <span class="highlight">просто</span></h2>
+                    <p>Мы убрали всё лишнее. Никаких сложных настроек, токенов и регистраций.</p>
+                    <p>Программа автоматически определяет ссылку, предлагает лучшее качество и скачивает файл в выбранную папку.</p>
+                    <p>Просто вставь ссылку — и готово.</p>
+                </div>
+                <div class="simplicity-visual">
+                    <div class="big-icon">⚡</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ОГРОМНЫЕ КАРТОЧКИ -->
+    <section class="features reveal">
+        <div class="container">
+            <h2>Почему выбирают нас?</h2>
+            <p class="section-desc">Быстро развивающийся проект с фокусом на качество и дизайн.</p>
+            
+            <div class="features-grid">
+                <!-- Карточка 1 -->
+                <div class="feature-card">
+                    <div class="card-icon">💎</div>
+                    <h3>Хайповый Дизайн</h3>
+                    <p>Тёмная тема, приятные анимации и Glassmorphism. Интерфейс, которым приятно пользоваться каждый день.</p>
+                </div>
+                
+                <!-- Карточка 2 -->
+                <div class="feature-card">
+                    <div class="card-icon">🎬</div>
+                    <h3>4K и 60 FPS</h3>
+                    <p>Поддержка максимального качества видео. Скачивай контент именно таким, каким его задумал автор.</p>
+                </div>
+
+                <!-- Карточка 3 -->
+                <div class="feature-card">
+                    <div class="card-icon">🎵</div>
+                    <h3>Аудио в MP3</h3>
+                    <p>Нужна только музыка? Вытягивай аудиодорожки из видео в один клик с битрейтом 192kbps.</p>
+                </div>
+
+                <!-- Карточка 4 -->
+                <div class="feature-card">
+                    <div class="card-icon">🔓</div>
+                    <h3>Open Source</h3>
+                    <p>Полностью открытый исходный код. Никаких вирусов, майнеров и скрытых процессов. Всё прозрачно.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ПОДВАЛ -->
+    <footer class="reveal">
+        <div class="container">
+            <div class="footer-logo">Youtube Downloader</div>
+            <div class="footer-links">
+                <a href="https://github.com/kreweber/YoutubeDownloader" target="_blank">GitHub</a>
+                <a href="https://github.com/kreweber/YoutubeDownloader/issues" target="_blank">Report Bug</a>
+            </div>
+            <div class="copyright">
+                Developed by kreweber © 2026<br>
+                Сделано с душой для людей.
+            </div>
+        </div>
+    </footer>
+
+    <!-- СКРИПТ АНИМАЦИИ -->
+    <script>
+        // Анимация появления при скролле
+        const revealElements = document.querySelectorAll('.reveal');
+
+        const revealOnScroll = () => {
+            const windowHeight = window.innerHeight;
+            const elementVisible = 150;
+
+            revealElements.forEach((reveal) => {
+                const elementTop = reveal.getBoundingClientRect().top;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveal.classList.add('active');
+                }
+            });
+        };
+
+        window.addEventListener('scroll', revealOnScroll);
+        // Запускаем один раз при загрузке
+        revealOnScroll();
+
+        // Эффект подсветки мышкой для карточек
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.onmousemove = e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            }
+        });
+    </script>
+</body>
+</html>
